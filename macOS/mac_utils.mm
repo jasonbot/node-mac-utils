@@ -176,6 +176,12 @@ Napi::Value StopMonitoringMic(const Napi::CallbackInfo& info) {
   return env.Undefined();
 }
 
+// Gets processes accessing microphone with debounced result (macOS delegates to existing method)
+Napi::Value GetProcessAccessMicrophoneDebouncedWithResult(const Napi::CallbackInfo& info) {
+  // On macOS, delegate to the existing implementation since it's already reliable
+  return GetProcessesAccessingMicrophoneWithResult(info);
+}
+
 // No-op implementation for getRenderProcessesWithResult (Windows-only feature)
 Napi::Value GetRenderProcessesWithResult(const Napi::CallbackInfo& info) {
   Napi::Env env = info.Env();
@@ -198,6 +204,9 @@ Napi::Object Init(Napi::Env env, Napi::Object exports) {
 
   exports.Set(Napi::String::New(env, "getProcessesAccessingMicrophoneWithResult"),
               Napi::Function::New(env, GetProcessesAccessingMicrophoneWithResult));
+
+  exports.Set(Napi::String::New(env, "getProcessAccessMicrophoneDebouncedWithResult"),
+              Napi::Function::New(env, GetProcessAccessMicrophoneDebouncedWithResult));
 
   exports.Set(Napi::String::New(env, "startMonitoringMic"),
               Napi::Function::New(env, StartMonitoringMic));
