@@ -2,20 +2,20 @@ let platform_utils;
 
 const noopPlatformUtils = {
   getRunningInputAudioProcesses: () => {
-    return ["", ""];
+    return [];
   },
   getProcessesAccessingMicrophoneWithResult: () => {
     return {
       success: true,
       error: null,
-      processes: ["", ""],
+      processes: [],
     };
   },
   getProcessAccessMicrophoneDebouncedWithResult: () => {
     return {
       success: true,
       error: null,
-      processes: ["", ""],
+      processes: [],
     };
   },
   getProcessesAccessingSpeakersWithResult: () => {
