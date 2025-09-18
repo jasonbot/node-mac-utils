@@ -11,6 +11,13 @@ const noopPlatformUtils = {
       processes: ["", ""],
     };
   },
+  getProcessAccessMicrophoneDebouncedWithResult: () => {
+    return {
+      success: true,
+      error: null,
+      processes: ["", ""],
+    };
+  },
   getProcessesAccessingSpeakersWithResult: () => {
     return {
       success: true,
@@ -34,6 +41,8 @@ module.exports = {
   getRunningInputAudioProcesses: platform_utils.getRunningInputAudioProcesses,
   getProcessesAccessingMicrophoneWithResult:
     platform_utils.getProcessesAccessingMicrophoneWithResult,
+  getProcessAccessMicrophoneDebouncedWithResult:
+    platform_utils.getProcessAccessMicrophoneDebouncedWithResult,
   getProcessesAccessingSpeakersWithResult:
     platform_utils.getProcessesAccessingSpeakersWithResult,
   INFO_ERROR_CODE: 1,

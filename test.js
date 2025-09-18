@@ -27,6 +27,32 @@ async function runTests() {
             console.error('  Error domain:', result.domain);
         }
 
+        // Test new getProcessAccessMicrophoneDebouncedWithResult (enhanced Bluetooth support)
+        console.log('\nTesting getProcessAccessMicrophoneDebouncedWithResult (debounced):');
+        const debouncedResult = utils.getProcessAccessMicrophoneDebouncedWithResult();
+        console.log('Type:', typeof debouncedResult);
+        console.log('Result:', debouncedResult);
+
+        if (debouncedResult.success) {
+            console.log('✓ Success - Debounced audio processes:', debouncedResult.processes);
+            console.log('  Process count:', debouncedResult.processes.length);
+        } else {
+            console.error('✗ Error getting debounced audio processes:', debouncedResult.error);
+            console.error('  Error code:', debouncedResult.code);
+            console.error('  Error domain:', debouncedResult.domain);
+        }
+
+        // Compare debounced method with original structured method
+        console.log('\nComparing debounced method with original structured method:');
+        console.log('Same success status:', result.success === debouncedResult.success);
+        console.log('Same error status:', result.error === debouncedResult.error);
+        console.log('Same process count:', result.processes.length === debouncedResult.processes.length);
+        console.log('Return structure identical:',
+            typeof result.success === typeof debouncedResult.success &&
+            typeof result.error === typeof debouncedResult.error &&
+            Array.isArray(result.processes) === Array.isArray(debouncedResult.processes)
+        );
+
         // Test getProcessesAccessingSpeakersWithResult (cross-platform)
         console.log('\nTesting getProcessesAccessingSpeakersWithResult:');
         const renderResult = utils.getProcessesAccessingSpeakersWithResult();
@@ -61,6 +87,7 @@ async function runTests() {
             console.log('\nTesting Windows-specific functions:');
             console.log('getRunningInputAudioProcesses available:', !!utils.getRunningInputAudioProcesses);
             console.log('getProcessesAccessingMicrophoneWithResult available:', !!utils.getProcessesAccessingMicrophoneWithResult);
+            console.log('getProcessAccessMicrophoneDebouncedWithResult available:', !!utils.getProcessAccessMicrophoneDebouncedWithResult);
             console.log('getProcessesAccessingSpeakersWithResult available:', !!utils.getProcessesAccessingSpeakersWithResult);
         } else {
             console.log('node-mac-utils Unsupported platform:', process.platform);

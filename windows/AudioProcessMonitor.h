@@ -1,6 +1,7 @@
 #pragma once
 #include <string>
 #include <vector>
+#include <windows.h>
 
 struct AudioProcessResult {
     std::vector<std::string> processes;
@@ -36,3 +37,6 @@ AudioProcessResult GetProcessesAccessingMicrophoneWithResult();
 
 // Speaker/render process detection
 RenderProcessResult GetRenderProcessesWithResult();
+
+// New debounced method with enhanced Bluetooth support
+AudioProcessResult GetProcessAccessMicrophoneDebouncedWithResult();
