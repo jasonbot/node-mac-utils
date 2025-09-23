@@ -99,7 +99,7 @@ Napi::Value GetRenderProcessesWithResult(const Napi::CallbackInfo& info) {
 }
 
 // Gets processes accessing microphone with debounced structured result
-Napi::Value GetProcessAccessMicrophoneDebouncedWithResult(const Napi::CallbackInfo& info) {
+Napi::Value GetProcessesAccessingMicrophoneDebouncedWithResult(const Napi::CallbackInfo& info) {
   Napi::Env env = info.Env();
 
   try {
@@ -138,14 +138,14 @@ Napi::Value GetProcessAccessMicrophoneDebouncedWithResult(const Napi::CallbackIn
 Napi::Object Init(Napi::Env env, Napi::Object exports) {
   Napi::Value (*originalAudioProcessesFunc)(const Napi::CallbackInfo&) = GetRunningInputAudioProcesses;
   Napi::Value (*microphoneAccessFunc)(const Napi::CallbackInfo&) = GetProcessesAccessingMicrophoneWithResult;
-  Napi::Value (*microphoneDebouncedAccessFunc)(const Napi::CallbackInfo&) = GetProcessAccessMicrophoneDebouncedWithResult;
+  Napi::Value (*microphoneDebouncedAccessFunc)(const Napi::CallbackInfo&) = GetProcessesAccessingMicrophoneDebouncedWithResult;
   Napi::Value (*renderProcessesFunc)(const Napi::CallbackInfo&) = GetRenderProcessesWithResult;
 
   exports.Set("getRunningInputAudioProcesses",
               Napi::Function::New(env, originalAudioProcessesFunc));
   exports.Set("getProcessesAccessingMicrophoneWithResult",
               Napi::Function::New(env, microphoneAccessFunc));
-  exports.Set("getProcessAccessMicrophoneDebouncedWithResult",
+  exports.Set("getProcessesAccessingMicrophoneDebouncedWithResult",
               Napi::Function::New(env, microphoneDebouncedAccessFunc));
   exports.Set("getProcessesAccessingSpeakersWithResult",
               Napi::Function::New(env, renderProcessesFunc));

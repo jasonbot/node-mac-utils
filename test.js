@@ -27,9 +27,9 @@ async function runTests() {
             console.error('  Error domain:', result.domain);
         }
 
-        // Test new getProcessAccessMicrophoneDebouncedWithResult (enhanced Bluetooth support)
-        console.log('\nTesting getProcessAccessMicrophoneDebouncedWithResult (debounced):');
-        const debouncedResult = utils.getProcessAccessMicrophoneDebouncedWithResult();
+        // Test new getProcessesAccessingMicrophoneDebouncedWithResult (enhanced Bluetooth support)
+        console.log('\nTesting getProcessesAccessingMicrophoneDebouncedWithResult (debounced):');
+        const debouncedResult = utils.getProcessesAccessingMicrophoneDebouncedWithResult();
         console.log('Type:', typeof debouncedResult);
         console.log('Result:', debouncedResult);
 
@@ -87,7 +87,7 @@ async function runTests() {
             console.log('\nTesting Windows-specific functions:');
             console.log('getRunningInputAudioProcesses available:', !!utils.getRunningInputAudioProcesses);
             console.log('getProcessesAccessingMicrophoneWithResult available:', !!utils.getProcessesAccessingMicrophoneWithResult);
-            console.log('getProcessAccessMicrophoneDebouncedWithResult available:', !!utils.getProcessAccessMicrophoneDebouncedWithResult);
+            console.log('getProcessesAccessingMicrophoneDebouncedWithResult available:', !!utils.getProcessesAccessingMicrophoneDebouncedWithResult);
             console.log('getProcessesAccessingSpeakersWithResult available:', !!utils.getProcessesAccessingSpeakersWithResult);
         } else {
             console.log('node-mac-utils Unsupported platform:', process.platform);
