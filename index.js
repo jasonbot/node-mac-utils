@@ -31,6 +31,13 @@ if (process.platform === "darwin") {
   platform_utils = require("bindings")("mac_utils.node");
 } else if (process.platform === "win32") {
   platform_utils = require("bindings")("win_utils.node");
+} else if (process.platform === "linux") {
+  try {
+    platform_utils = require("pipewire-implementation");
+  } catch (e) {
+    console.log(`node-mac-utils Failed to import pipewire for Linux: ${e}`);
+    platform_utils = noopPlatformUtils;
+  }
 } else {
   console.log("node-mac-utils Unsupported platform:", process.platform);
   platform_utils = noopPlatformUtils;
