@@ -1,4 +1,4 @@
-import * as pipewire from "node-pipewire";
+const pipewire = require("node-pipewire");
 
 pipewire.createPwThread();
 
@@ -37,7 +37,7 @@ function getProcessesAccessingSpeakersWithResult() {
   };
 }
 
-export default {
+module.exports = {
   getRunningInputAudioProcesses,
   getProcessesAccessingMicrophoneWithResult,
   getProcessesAccessingMicrophoneDebouncedWithResult: debouncedResult(
