@@ -78,7 +78,13 @@ function getProcessesAccessingSpeakersWithResult() {
     error: null,
     processes: allLinkInfo()
       .filter((info) => info.output.isApp)
-      .map((info) => info.output.name),
+      .map((info) => {
+        return {
+          processName: info.output.name,
+          deviceName: info.input.name,
+          isActive: true,
+        };
+      }),
   };
 }
 
