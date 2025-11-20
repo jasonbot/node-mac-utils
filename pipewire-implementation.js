@@ -68,7 +68,7 @@ function getProcessesAccessingMicrophoneWithResult() {
     error: null,
     processes: allLinkInfo()
       .filter((info) => info.input.isApp)
-      .map((info) => (info.output.isApp ? info.output.name : info.input.name)),
+      .map((info) => info.input.name),
   };
 }
 
@@ -77,8 +77,8 @@ function getProcessesAccessingSpeakersWithResult() {
     success: true,
     error: null,
     processes: allLinkInfo()
-      .filter((info) => info.input.isApp)
-      .map((info) => (info.output.isApp ? info.output.name : info.input.name)),
+      .filter((info) => info.output.isApp)
+      .map((info) => info.output.name),
   };
 }
 
