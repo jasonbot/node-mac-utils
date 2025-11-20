@@ -26,5 +26,13 @@ declare module "node-mac-utils" {
   export function getRunningInputAudioProcesses(): string[];
   export function getProcessesAccessingMicrophoneWithResult(): ResultWithProcesses<string>;
   export function getProcessesAccessingMicrophoneDebouncedWithResult(): ResultWithProcesses<string>;
+
+  // No-op on Mac
   export function getProcessesAccessingSpeakersWithResult(): ResultWithProcesses<ProcessInfo>;
+
+  // Mac-only
+  const makeKeyAndOrderFront: (windowID: number) => void | undefined;
+  const startMonitoringMic: () => void | undefined;
+  const stopMonitoringMic: () => void | undefined;
+  export { makeKeyAndOrderFront, startMonitoringMic, stopMonitoringMic };
 }
