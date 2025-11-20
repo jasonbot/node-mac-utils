@@ -2,7 +2,7 @@ const pipewire = require("node-pipewire");
 
 pipewire.createPwThread();
 
-function allInfo() {
+function allLinkInfo() {
   const outputNodes = Object.fromEntries(
     pipewire.getOutputNodes().map((p) => [
       p.id,
@@ -27,12 +27,16 @@ function allInfo() {
     ])
   );
 
-  const links = pipewire.getLinks().map((link) => {
-    return {
-      input: inputNodes[link.input_node_id],
-      output: outputNodes[link.output_node_id],
-    };
-  });
+  const links = [
+    ...new Set(
+      pipewire.getLinks().map((link) => {
+        return JSON.stringify({
+          input: inputNodes[link.input_node_id],
+          output: outputNodes[link.output_node_id],
+        });
+      })
+    ).keys(),
+  ].map((link) => JSON.parse(link));
 
   return links;
 }
@@ -53,14 +57,18 @@ function debouncedResult(fn, delay) {
 }
 
 function getRunningInputAudioProcesses() {
-  return [];
+  return allLinkInfo()
+    .filter((info) => info.input.isApp)
+    .map((info) => (info.output.isApp ? info.output.name : info.input.name));
 }
 
 function getProcessesAccessingMicrophoneWithResult() {
   return {
     success: true,
     error: null,
-    processes: [],
+    processes: allLinkInfo()
+      .filter((info) => info.input.isApp)
+      .map((info) => (info.output.isApp ? info.output.name : info.input.name)),
   };
 }
 
@@ -68,7 +76,9 @@ function getProcessesAccessingSpeakersWithResult() {
   return {
     success: true,
     error: null,
-    processes: [],
+    processes: allLinkInfo()
+      .filter((info) => info.input.isApp)
+      .map((info) => (info.output.isApp ? info.output.name : info.input.name)),
   };
 }
 
