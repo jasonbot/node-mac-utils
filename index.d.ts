@@ -1,6 +1,4 @@
 declare module "node-mac-utils" {
-  export function getRunningInputAudioProcesses(): string[];
-
   type ProcessInfo = {
     processName: string;
     processId?: number;
@@ -10,6 +8,7 @@ declare module "node-mac-utils" {
 
   type ResultSuccessWithProcess<T> = {
     success: true;
+    error: null;
     processes: T[];
   };
 
@@ -24,6 +23,7 @@ declare module "node-mac-utils" {
     | ResultSuccessWithProcess<T>
     | ResultErrorWithProcess<T>;
 
+  export function getRunningInputAudioProcesses(): string[];
   export function getProcessesAccessingMicrophoneWithResult(): ResultWithProcesses<string>;
   export function getProcessesAccessingMicrophoneDebouncedWithResult(): ResultWithProcesses<string>;
   export function getProcessesAccessingSpeakersWithResult(): ResultWithProcesses<ProcessInfo>;
