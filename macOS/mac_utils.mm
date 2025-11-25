@@ -2,6 +2,7 @@
 #import <Foundation/Foundation.h>
 #import "AudioProcessMonitor.h"
 #import "MicrophoneUsageMonitor.h"
+#import "MicrophonePermissions.h"
 #include <napi.h>
 
 static MicrophoneUsageMonitor *monitor = nil;
@@ -195,6 +196,15 @@ Napi::Value GetRenderProcessesWithResult(const Napi::CallbackInfo& info) {
   return resultObj;
 }
 
+// Gets the microphone authorization status
+Napi::Value GetMicrophoneAuthorizationStatus(const Napi::CallbackInfo& info) {
+  Napi::Env env = info.Env();
+
+  NSString *status = [MicrophonePermissions getMicrophoneAuthorizationStatus];
+
+  return Napi::String::New(env, [status UTF8String]);
+}
+
 Napi::Object Init(Napi::Env env, Napi::Object exports) {
   exports.Set(Napi::String::New(env, "makeKeyAndOrderFront"),
               Napi::Function::New(env, MakeKeyAndOrderFront));
@@ -216,6 +226,9 @@ Napi::Object Init(Napi::Env env, Napi::Object exports) {
 
   exports.Set(Napi::String::New(env, "getProcessesAccessingSpeakersWithResult"),
               Napi::Function::New(env, GetRenderProcessesWithResult));
+
+  exports.Set(Napi::String::New(env, "getMicrophoneAuthorizationStatus"),
+              Napi::Function::New(env, GetMicrophoneAuthorizationStatus));
 
   return exports;
 }
