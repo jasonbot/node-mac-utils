@@ -205,6 +205,39 @@ Napi::Value GetMicrophoneAuthorizationStatus(const Napi::CallbackInfo& info) {
   return Napi::String::New(env, [status UTF8String]);
 }
 
+// Requests microphone access (returns a Promise)
+Napi::Value RequestMicrophoneAccess(const Napi::CallbackInfo& info) {
+  Napi::Env env = info.Env();
+  auto deferred = std::make_shared<Napi::Promise::Deferred>(Napi::Promise::Deferred::New(env));
+
+  // Create a ThreadSafeFunction to safely call back to JavaScript from any thread
+  auto tsfn = std::make_shared<Napi::ThreadSafeFunction>(
+    Napi::ThreadSafeFunction::New(
+      env,
+      Napi::Function::New(env, [](const Napi::CallbackInfo&) {}), // Dummy function
+      "RequestMicAccess",
+      0,
+      1
+    )
+  );
+
+  [MicrophonePermissions requestMicrophoneAccess:^(BOOL granted) {
+    // This completion handler may be called on any thread
+    auto callback = [deferred](Napi::Env env, Napi::Function, bool* grantedPtr) {
+      if (grantedPtr) {
+        deferred->Resolve(Napi::Boolean::New(env, *grantedPtr));
+        delete grantedPtr;
+      }
+    };
+
+    bool* grantedPtr = new bool(granted);
+    (*tsfn).BlockingCall(grantedPtr, callback);
+    (*tsfn).Release();
+  }];
+
+  return deferred->Promise();
+}
+
 Napi::Object Init(Napi::Env env, Napi::Object exports) {
   exports.Set(Napi::String::New(env, "makeKeyAndOrderFront"),
               Napi::Function::New(env, MakeKeyAndOrderFront));
@@ -229,6 +262,9 @@ Napi::Object Init(Napi::Env env, Napi::Object exports) {
 
   exports.Set(Napi::String::New(env, "getMicrophoneAuthorizationStatus"),
               Napi::Function::New(env, GetMicrophoneAuthorizationStatus));
+
+  exports.Set(Napi::String::New(env, "requestMicrophoneAccess"),
+              Napi::Function::New(env, RequestMicrophoneAccess));
 
   return exports;
 }

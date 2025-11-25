@@ -20,4 +20,12 @@
   }
 }
 
++ (void)requestMicrophoneAccess:(void (^)(BOOL granted))completionHandler {
+  [AVCaptureDevice requestAccessForMediaType:AVMediaTypeAudio completionHandler:^(BOOL granted) {
+    if (completionHandler) {
+      completionHandler(granted);
+    }
+  }];
+}
+
 @end

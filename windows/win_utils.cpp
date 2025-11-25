@@ -142,6 +142,17 @@ Napi::Value GetMicrophoneAuthorizationStatus(const Napi::CallbackInfo& info) {
   return Napi::String::New(env, "Authorized");
 }
 
+// Requests microphone access (no-op on Windows, returns resolved Promise with true)
+Napi::Value RequestMicrophoneAccess(const Napi::CallbackInfo& info) {
+  Napi::Env env = info.Env();
+  Napi::Promise::Deferred deferred = Napi::Promise::Deferred::New(env);
+
+  // On Windows, immediately resolve with true (positive permissions)
+  deferred.Resolve(Napi::Boolean::New(env, true));
+
+  return deferred.Promise();
+}
+
 // Initialize the module exports
 Napi::Object Init(Napi::Env env, Napi::Object exports) {
   Napi::Value (*originalAudioProcessesFunc)(const Napi::CallbackInfo&) = GetRunningInputAudioProcesses;
@@ -149,6 +160,7 @@ Napi::Object Init(Napi::Env env, Napi::Object exports) {
   Napi::Value (*microphoneDebouncedAccessFunc)(const Napi::CallbackInfo&) = GetProcessesAccessingMicrophoneDebouncedWithResult;
   Napi::Value (*renderProcessesFunc)(const Napi::CallbackInfo&) = GetRenderProcessesWithResult;
   Napi::Value (*microphoneAuthStatusFunc)(const Napi::CallbackInfo&) = GetMicrophoneAuthorizationStatus;
+  Napi::Value (*requestMicAccessFunc)(const Napi::CallbackInfo&) = RequestMicrophoneAccess;
 
   exports.Set("getRunningInputAudioProcesses",
               Napi::Function::New(env, originalAudioProcessesFunc));
@@ -160,6 +172,8 @@ Napi::Object Init(Napi::Env env, Napi::Object exports) {
               Napi::Function::New(env, renderProcessesFunc));
   exports.Set("getMicrophoneAuthorizationStatus",
               Napi::Function::New(env, microphoneAuthStatusFunc));
+  exports.Set("requestMicrophoneAccess",
+              Napi::Function::New(env, requestMicAccessFunc));
 
   return exports;
 }

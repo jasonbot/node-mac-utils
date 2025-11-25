@@ -28,6 +28,9 @@ const noopPlatformUtils = {
   getMicrophoneAuthorizationStatus: () => {
     return "Authorized";
   },
+  requestMicrophoneAccess: () => {
+    return Promise.resolve(true);
+  },
 };
 
 if (process.platform === "darwin") {
@@ -50,6 +53,8 @@ module.exports = {
     platform_utils.getProcessesAccessingSpeakersWithResult,
   getMicrophoneAuthorizationStatus:
     platform_utils.getMicrophoneAuthorizationStatus,
+  requestMicrophoneAccess:
+    platform_utils.requestMicrophoneAccess,
   INFO_ERROR_CODE: 1,
   ERROR_DOMAIN: "com.MicrophoneUsageMonitor",
 

@@ -13,4 +13,12 @@
  */
 + (NSString *)getMicrophoneAuthorizationStatus;
 
+/**
+ * Requests microphone access from the user.
+ * This will trigger a system permission dialog if the user hasn't been asked before.
+ *
+ * @param completionHandler Block called with YES if access was granted, NO otherwise
+ */
++ (void)requestMicrophoneAccess:(void (^)(BOOL granted))completionHandler;
+
 @end
