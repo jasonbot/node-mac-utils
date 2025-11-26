@@ -2,6 +2,7 @@
 #include <string>
 #include <vector>
 #include <windows.h>
+#include <cstdint>
 
 struct AudioProcessResult {
     std::vector<std::string> processes;
@@ -40,3 +41,5 @@ RenderProcessResult GetRenderProcessesWithResult();
 
 // New debounced method with enhanced Bluetooth support
 AudioProcessResult GetProcessAccessMicrophoneDebouncedWithResult();
+
+std::vector<std::string> GetRunningProcesses();

@@ -1,6 +1,27 @@
 #include <napi.h>
 #include <windows.h>
 #include "AudioProcessMonitor.h"
+#include "MSIXTools.h"
+
+
+// Gets a list of running .exe files
+Napi::Value GetRunningProcesses(const Napi::CallbackInfo& info) {
+  Napi::Env env = info.Env();
+
+  try {
+    std::vector<std::string> processes = GetRunningProcesses();
+
+    Napi::Array result = Napi::Array::New(env);
+    for (size_t i = 0; i < processes.size(); i++) {
+      result.Set(i, Napi::String::New(env, processes[i]));
+    }
+
+    return result;
+  } catch (const std::exception& e) {
+    Napi::Error::New(env, e.what()).ThrowAsJavaScriptException();
+    return env.Null();
+  }
+}
 
 // Gets a list of processes that are accessing input (microphone) - original interface
 Napi::Value GetRunningInputAudioProcesses(const Napi::CallbackInfo& info) {
@@ -134,13 +155,71 @@ Napi::Value GetProcessesAccessingMicrophoneDebouncedWithResult(const Napi::Callb
   }
 }
 
+
+static Napi::Object installedAppToObject(const Napi::Env& env, const InstalledApp& app) {
+    Napi::Object appObj = Napi::Object::New(env);
+    appObj.Set("type", Napi::String::New(env, app.AppType));
+    appObj.Set("name", Napi::String::New(env, app.AppName));
+    appObj.Set("id", Napi::String::New(env, app.Id));
+    appObj.Set("version", Napi::String::New(env, app.Version));
+
+    return appObj;
+}
+
+// Gets installed apps
+Napi::Value ListInstalledAppsWindows(const Napi::CallbackInfo& info) {
+  Napi::Env env = info.Env();
+
+  try {
+    auto apps = ListInstalledApps();
+
+    Napi::Array result = Napi::Array::New(env);
+    auto index(0);
+    for (auto app : apps) {
+      Napi::Object appObj = Napi::Object::New(env);
+      result.Set(index, installedAppToObject(env, app));
+      index += 1;
+    }
+
+    return result;
+  } catch (const std::exception& e) {
+    Napi::Error::New(env, e.what()).ThrowAsJavaScriptException();
+    return env.Null();
+  }
+}
+
+
+Napi::Value CurrentInstalledAppWindows(const Napi::CallbackInfo& info) {
+    auto currentApp = CurrentApp();
+    Napi::Env env = info.Env();
+
+    if (currentApp == nullptr) {
+        return env.Null();
+    } else {
+        auto val = *currentApp;
+        return installedAppToObject(env, val);
+    }
+}
+
+Napi::Value InstallMSIXAndRestartWindows(const Napi::CallbackInfo& info) {
+    Napi::Env env = info.Env();
+    return env.Null();
+}
+
+
 // Initialize the module exports
 Napi::Object Init(Napi::Env env, Napi::Object exports) {
+  Napi::Value (*getRunningProcessesFunc)(const Napi::CallbackInfo&) = GetRunningProcesses;
   Napi::Value (*originalAudioProcessesFunc)(const Napi::CallbackInfo&) = GetRunningInputAudioProcesses;
   Napi::Value (*microphoneAccessFunc)(const Napi::CallbackInfo&) = GetProcessesAccessingMicrophoneWithResult;
   Napi::Value (*microphoneDebouncedAccessFunc)(const Napi::CallbackInfo&) = GetProcessesAccessingMicrophoneDebouncedWithResult;
   Napi::Value (*renderProcessesFunc)(const Napi::CallbackInfo&) = GetRenderProcessesWithResult;
+  Napi::Value (*listInstalledAppsFunc)(const Napi::CallbackInfo&) = ListInstalledAppsWindows;
+  Napi::Value (*currentInstalledAppFunc)(const Napi::CallbackInfo&) = CurrentInstalledAppWindows;
+  Napi::Value (*installMSIXAndRestartFunc)(const Napi::CallbackInfo&) = InstallMSIXAndRestartWindows;
 
+  exports.Set("getRunningProcesses",
+              Napi::Function::New(env, getRunningProcessesFunc));
   exports.Set("getRunningInputAudioProcesses",
               Napi::Function::New(env, originalAudioProcessesFunc));
   exports.Set("getProcessesAccessingMicrophoneWithResult",
@@ -149,6 +228,12 @@ Napi::Object Init(Napi::Env env, Napi::Object exports) {
               Napi::Function::New(env, microphoneDebouncedAccessFunc));
   exports.Set("getProcessesAccessingSpeakersWithResult",
               Napi::Function::New(env, renderProcessesFunc));
+  exports.Set("listInstalledApps",
+              Napi::Function::New(env, listInstalledAppsFunc));
+  exports.Set("currentInstalledApp",
+              Napi::Function::New(env, currentInstalledAppFunc));
+  exports.Set("installMSIXAndRestart",
+              Napi::Function::New(env, installMSIXAndRestartFunc));
 
   return exports;
 }

@@ -1,18 +1,18 @@
 declare module "node-mac-utils" {
-  type ProcessInfo = {
+  export type ProcessInfo = {
     processName: string;
     processId?: number;
     deviceName: string;
     isActive: boolean;
   };
 
-  type ResultSuccessWithProcess<T> = {
+  export type ResultSuccessWithProcess<T> = {
     success: true;
     error: null;
     processes: T[];
   };
 
-  type ResultErrorWithProcess<T> = {
+  export type ResultErrorWithProcess<T> = {
     success: false;
     error: string;
     code: number;
@@ -30,9 +30,20 @@ declare module "node-mac-utils" {
   // No-op on Mac
   export function getProcessesAccessingSpeakersWithResult(): ResultWithProcesses<ProcessInfo>;
 
+  // Windows-only
+  export type InstalledApp = {
+    type: string;
+    name: string;
+    id: string;
+    version: string;
+  };
+  export function getRunningProcesses(): string[];
+  export function listInstalledApps(): InstalledApp[];
+  export function currentInstalledApp(): InstalledApp | undefined;
+  export function installMSIXAndRestart(fileUri: string): void;
+
   // Mac-only
-  const makeKeyAndOrderFront: (windowID: number) => void | undefined;
-  const startMonitoringMic: () => void | undefined;
-  const stopMonitoringMic: () => void | undefined;
-  export { makeKeyAndOrderFront, startMonitoringMic, stopMonitoringMic };
+  export function makeKeyAndOrderFront(windowID: number): void;
+  export function startMonitoringMic(): void;
+  export function stopMonitoringMic(): void;
 }
