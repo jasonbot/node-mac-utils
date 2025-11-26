@@ -5,7 +5,7 @@
 
 
 // Gets a list of running .exe files
-Napi::Value GetRunningProcesses(const Napi::CallbackInfo& info) {
+Napi::Value GetRunningProcessesWindows(const Napi::CallbackInfo& info) {
   Napi::Env env = info.Env();
 
   try {
@@ -209,7 +209,7 @@ Napi::Value InstallMSIXAndRestartWindows(const Napi::CallbackInfo& info) {
 
 // Initialize the module exports
 Napi::Object Init(Napi::Env env, Napi::Object exports) {
-  Napi::Value (*getRunningProcessesFunc)(const Napi::CallbackInfo&) = GetRunningProcesses;
+  Napi::Value (*getRunningProcessesFunc)(const Napi::CallbackInfo&) = GetRunningProcessesWindows;
   Napi::Value (*originalAudioProcessesFunc)(const Napi::CallbackInfo&) = GetRunningInputAudioProcesses;
   Napi::Value (*microphoneAccessFunc)(const Napi::CallbackInfo&) = GetProcessesAccessingMicrophoneWithResult;
   Napi::Value (*microphoneDebouncedAccessFunc)(const Napi::CallbackInfo&) = GetProcessesAccessingMicrophoneDebouncedWithResult;
