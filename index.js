@@ -25,6 +25,10 @@ const noopPlatformUtils = {
       processes: [],
     };
   },
+  getRunningProcesses: () => [],
+  listInstalledApps: () => [],
+  currentInstalledApp: () => null,
+  installMSIXAndRestart: () => {},
 };
 
 if (process.platform === "darwin") {
@@ -44,6 +48,7 @@ if (process.platform === "darwin") {
 }
 
 module.exports = {
+  ...noopPlatformUtils,
   // Common exports that work on all platforms
   getRunningInputAudioProcesses: platform_utils.getRunningInputAudioProcesses,
   getProcessesAccessingMicrophoneWithResult:
@@ -61,6 +66,15 @@ module.exports = {
         makeKeyAndOrderFront: platform_utils.makeKeyAndOrderFront,
         startMonitoringMic: platform_utils.startMonitoringMic,
         stopMonitoringMic: platform_utils.stopMonitoringMic,
+      }
+    : {}),
+  // Windows-specific imports
+  ...(process.platform === "win32"
+    ? {
+        getRunningProcesses: platform_utils.getRunningProcesses,
+        listInstalledApps: platform_utils.listInstalledApps,
+        currentInstalledApp: platform_utils.listInstalledApps,
+        installMSIXAndRestart: platform_utils.installMSIXAndRestart,
       }
     : {}),
 };

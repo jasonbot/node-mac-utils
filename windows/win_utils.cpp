@@ -203,6 +203,12 @@ Napi::Value CurrentInstalledAppWindows(const Napi::CallbackInfo& info) {
 
 Napi::Value InstallMSIXAndRestartWindows(const Napi::CallbackInfo& info) {
     Napi::Env env = info.Env();
+    const auto firstArg = info[0];
+    if (firstArg.IsString()) {
+        const auto stringVal = firstArg.As<Napi::String>();
+        InstallMSIXAndRestart(stringVal);
+    }
+
     return env.Null();
 }
 
