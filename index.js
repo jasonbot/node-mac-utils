@@ -73,7 +73,7 @@ module.exports = {
   ...(process.platform === "win32"
     ? {
         getRunningProcesses: platform_utils.getRunningProcesses,
-        this.getRunningAppIDs: platform_utils.getRunningAppIDs,
+        getRunningAppIDs: platform_utils.getRunningAppIDs,
         listInstalledApps: platform_utils.listInstalledApps,
         currentInstalledApp: platform_utils.listInstalledApps,
         installMSIXAndRestart: platform_utils.installMSIXAndRestart,
