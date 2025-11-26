@@ -9,6 +9,7 @@
           "macOS/AudioProcessMonitor.m",
           "macOS/MicrophoneUsageMonitor.m",
           "macOS/MicrophonePermissions.m",
+          "macOS/ScreenCapturePermissions.m",
         ],
         "xcode_settings": {
           "OTHER_CFLAGS": ["-fobjc-arc"]
@@ -24,7 +25,7 @@
     ],
     'defines': [ 'NAPI_DISABLE_CPP_EXCEPTIONS' ],
     "xcode_settings": {
-      "MACOSX_DEPLOYMENT_TARGET": "10.14",
+      "MACOSX_DEPLOYMENT_TARGET": "10.15",
       "SYSTEM_VERSION_COMPAT": 1,
       "OTHER_CPLUSPLUSFLAGS": ["-std=c++14", "-stdlib=libc++"],
       "OTHER_LDFLAGS": [

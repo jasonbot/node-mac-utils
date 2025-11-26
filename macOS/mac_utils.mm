@@ -3,6 +3,7 @@
 #import "AudioProcessMonitor.h"
 #import "MicrophoneUsageMonitor.h"
 #import "MicrophonePermissions.h"
+#import "ScreenCapturePermissions.h"
 #include <napi.h>
 
 static MicrophoneUsageMonitor *monitor = nil;
@@ -238,6 +239,24 @@ Napi::Value RequestMicrophoneAccess(const Napi::CallbackInfo& info) {
   return deferred->Promise();
 }
 
+// Checks if the application has screen capture access
+Napi::Value CheckScreenCaptureAccess(const Napi::CallbackInfo& info) {
+  Napi::Env env = info.Env();
+
+  BOOL hasAccess = [ScreenCapturePermissions checkScreenCaptureAccess];
+
+  return Napi::Boolean::New(env, hasAccess);
+}
+
+// Requests screen capture access
+Napi::Value RequestScreenCaptureAccess(const Napi::CallbackInfo& info) {
+  Napi::Env env = info.Env();
+
+  BOOL granted = [ScreenCapturePermissions requestScreenCaptureAccess];
+
+  return Napi::Boolean::New(env, granted);
+}
+
 Napi::Object Init(Napi::Env env, Napi::Object exports) {
   exports.Set(Napi::String::New(env, "makeKeyAndOrderFront"),
               Napi::Function::New(env, MakeKeyAndOrderFront));
@@ -265,6 +284,12 @@ Napi::Object Init(Napi::Env env, Napi::Object exports) {
 
   exports.Set(Napi::String::New(env, "requestMicrophoneAccess"),
               Napi::Function::New(env, RequestMicrophoneAccess));
+
+  exports.Set(Napi::String::New(env, "checkScreenCaptureAccess"),
+              Napi::Function::New(env, CheckScreenCaptureAccess));
+
+  exports.Set(Napi::String::New(env, "requestScreenCaptureAccess"),
+              Napi::Function::New(env, RequestScreenCaptureAccess));
 
   return exports;
 }
