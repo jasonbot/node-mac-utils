@@ -69,7 +69,7 @@ module.exports = {
         stopMonitoringMic: platform_utils.stopMonitoringMic,
       }
     : {}),
-  // Windows-specific imports
+  // Windows-specific exports
   ...(process.platform === "win32"
     ? {
         getRunningProcesses: platform_utils.getRunningProcesses,
