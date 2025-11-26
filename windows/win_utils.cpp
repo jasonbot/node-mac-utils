@@ -23,6 +23,25 @@ Napi::Value GetRunningProcessesWindows(const Napi::CallbackInfo& info) {
   }
 }
 
+// Gets a list of full package IDs
+Napi::Value GetRunningAppIdsWindows(const Napi::CallbackInfo& info) {
+  Napi::Env env = info.Env();
+
+  try {
+    std::vector<std::string> processes = ListRunningAppIds();
+
+    Napi::Array result = Napi::Array::New(env);
+    for (size_t i = 0; i < processes.size(); i++) {
+      result.Set(i, Napi::String::New(env, processes[i]));
+    }
+
+    return result;
+  } catch (const std::exception& e) {
+    Napi::Error::New(env, e.what()).ThrowAsJavaScriptException();
+    return env.Null();
+  }
+}
+
 // Gets a list of processes that are accessing input (microphone) - original interface
 Napi::Value GetRunningInputAudioProcesses(const Napi::CallbackInfo& info) {
   Napi::Env env = info.Env();
@@ -216,6 +235,7 @@ Napi::Value InstallMSIXAndRestartWindows(const Napi::CallbackInfo& info) {
 // Initialize the module exports
 Napi::Object Init(Napi::Env env, Napi::Object exports) {
   Napi::Value (*getRunningProcessesFunc)(const Napi::CallbackInfo&) = GetRunningProcessesWindows;
+  Napi::Value (*getRunningAppIDsFunc)(const Napi::CallbackInfo&) = GetRunningAppIdsWindows;
   Napi::Value (*originalAudioProcessesFunc)(const Napi::CallbackInfo&) = GetRunningInputAudioProcesses;
   Napi::Value (*microphoneAccessFunc)(const Napi::CallbackInfo&) = GetProcessesAccessingMicrophoneWithResult;
   Napi::Value (*microphoneDebouncedAccessFunc)(const Napi::CallbackInfo&) = GetProcessesAccessingMicrophoneDebouncedWithResult;
@@ -225,6 +245,8 @@ Napi::Object Init(Napi::Env env, Napi::Object exports) {
   Napi::Value (*installMSIXAndRestartFunc)(const Napi::CallbackInfo&) = InstallMSIXAndRestartWindows;
 
   exports.Set("getRunningProcesses",
+              Napi::Function::New(env, getRunningProcessesFunc));
+  exports.Set("getRunningAppIDs",
               Napi::Function::New(env, getRunningProcessesFunc));
   exports.Set("getRunningInputAudioProcesses",
               Napi::Function::New(env, originalAudioProcessesFunc));
