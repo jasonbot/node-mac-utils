@@ -1,3 +1,4 @@
+#pragma once
 #include <string>
 #include <vector>
 
@@ -7,6 +8,8 @@ public:
   std::string AppName;
   std::string Id;
   std::string Version;
+
+  InstalledApp(): AppType("application"){}
 };
 
 std::vector<std::string> GetRunningProcesses();

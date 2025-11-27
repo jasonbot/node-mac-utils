@@ -61,7 +61,6 @@ std::vector<std::string> GetRunningProcesses() {
 static InstalledApp fromBundle(NSBundle *bundle) {
   InstalledApp installedApp;
   @autoreleasepool {
-    installedApp.AppType = "application";
     installedApp.AppName =
         [[bundle objectForInfoDictionaryKey:(id)kCFBundleNameKey] UTF8String];
     installedApp.Id = [[bundle bundleIdentifier] UTF8String];
@@ -93,12 +92,13 @@ std::vector<InstalledApp> ListInstalledApps() {
         auto bundle = [NSBundle bundleWithPath:appPath];
 
         InstalledApp installedApp;
-        installedApp.AppType = "application";
         installedApp.AppName = [[bundle
             objectForInfoDictionaryKey:(id)kCFBundleNameKey] UTF8String];
         installedApp.Id = [[bundle bundleIdentifier] UTF8String];
         installedApp.Version = [[bundle
             objectForInfoDictionaryKey:(id)kCFBundleVersionKey] UTF8String];
+
+        apps.push_back(installedApp);
       }
     }
   }
@@ -113,7 +113,11 @@ std::vector<std::string> ListRunningAppIds() {
     auto workspace = [NSWorkspace sharedWorkspace];
     auto apps = [workspace runningApplications];
     for (const id app : apps) {
-      auto bundle = [app bundle];
+      auto bundleId = [app bundleIdentifier];
+      if (bundleId == nil) {
+          continue;
+      }
+      auto bundle = [NSBundle bundleWithIdentifier:bundleId];
 
       if (bundle != nullptr) {
         appIds.push_back(std::string([[bundle

@@ -198,9 +198,14 @@ Napi::Value GetRenderProcessesWithResult(const Napi::CallbackInfo& info) {
 
 Napi::Value GetRunningProcessesFunc(const Napi::CallbackInfo& info) {
   Napi::Env env = info.Env();
-  Napi::Object resultObj = Napi::Array::New(env);
 
-  return resultObj;
+  auto processes = GetRunningProcesses();
+  Napi::Array result = Napi::Array::New(env);
+  for (size_t i = 0; i < processes.size(); i++) {
+      result.Set(i, Napi::String::New(env, processes[i]));
+  }
+
+  return result;
 }
 
 
@@ -208,11 +213,10 @@ Napi::Value GetRunningProcessesFunc(const Napi::CallbackInfo& info) {
 Napi::Value GetRunningAppIDsFunc(const Napi::CallbackInfo& info) {
   Napi::Env env = info.Env();
 
-  std::vector<std::string> processes = ListRunningAppIds();
-
+  auto appIds = ListRunningAppIds();
   Napi::Array result = Napi::Array::New(env);
-  for (size_t i = 0; i < processes.size(); i++) {
-      result.Set(i, Napi::String::New(env, processes[i]));
+  for (size_t i = 0; i < appIds.size(); i++) {
+      result.Set(i, Napi::String::New(env, appIds[i]));
   }
 
   return result;
@@ -244,9 +248,9 @@ Napi::Value ListInstalledAppsFunc(const Napi::CallbackInfo& info) {
 }
 
 Napi::Value CurrentInstalledAppFunc(const Napi::CallbackInfo& info) {
-    auto currentApp = CurrentApp();
     Napi::Env env = info.Env();
 
+    auto currentApp = CurrentApp();
     if (currentApp == nullptr) {
         return env.Null();
     } else {
