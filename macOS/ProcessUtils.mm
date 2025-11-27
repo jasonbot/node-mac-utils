@@ -41,16 +41,16 @@ std::vector<std::string> GetRunningProcesses() {
   }
 
   count = length / sizeof(struct kinfo_proc);
+  char pathbuf[PROC_PIDPATHINFO_MAXSIZE];
   for (int i = 0; i < count; i++) {
     pid_t pid = info[i].kp_proc.p_pid;
     if (pid == 0) {
       continue;
     }
 
-    char pathbuf[PROC_PIDPATHINFO_MAXSIZE];
     int ret = proc_pidpath(pid, pathbuf, sizeof(pathbuf));
     if (ret > 0) {
-      processes.push_back(pathbuf);
+      processes.push_back(std::string(pathbuf));
     }
   }
   free(info);
