@@ -15,7 +15,6 @@ std::vector<std::string> GetRunningProcesses() {
     size_t size = sizeof(maxArgumentSize);
     if (sysctl((int[]){CTL_KERN, KERN_ARGMAX}, 2, &maxArgumentSize, &size, NULL,
                0) == -1) {
-      perror("sysctl argument size");
       maxArgumentSize = 4096; // Default
     }
   }
@@ -44,6 +43,8 @@ std::vector<std::string> GetRunningProcesses() {
     if (pid == 0) {
       continue;
     }
+
+    NSLog(@"I am now here, querying pid %i", pid);
 
     int ret = proc_pidpath(pid, pathbuf, sizeof(pathbuf));
     if (ret > 0) {
