@@ -1,12 +1,12 @@
-#include <vector>
 #include <string>
+#include <vector>
 
 class InstalledApp {
 public:
-	std::string AppType;
-	std::string AppName;
-	std::string Id;
-	std::string Version;
+  std::string AppType;
+  std::string AppName;
+  std::string Id;
+  std::string Version;
 };
 
 std::vector<std::string> GetRunningProcesses();
