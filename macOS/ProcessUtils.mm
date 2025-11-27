@@ -7,9 +7,6 @@
 
 #include "ProcessUtils.h"
 
-extern CFStringRef const kCFBundleNameKey;
-extern CFStringRef const kCFBundleVersionKey;
-
 std::vector<std::string> GetRunningProcesses() {
   std::vector<std::string> processes;
 
@@ -61,11 +58,37 @@ std::vector<std::string> GetRunningProcesses() {
 static InstalledApp fromBundle(NSBundle *bundle) {
   InstalledApp installedApp;
   @autoreleasepool {
-    installedApp.AppName =
-        [[bundle objectForInfoDictionaryKey:(id)kCFBundleNameKey] UTF8String];
-    installedApp.Id = [[bundle bundleIdentifier] UTF8String];
-    installedApp.Version = [[bundle
-        objectForInfoDictionaryKey:(id)kCFBundleVersionKey] UTF8String];
+    NSString *bundleId = nil;
+
+    if (bundle != nil) {
+      bundleId = [bundle bundleIdentifier];
+    }
+    if (bundleId == nil) {
+      installedApp.AppType = "invalid";
+      return installedApp;
+    }
+
+    installedApp.Id = [bundleId UTF8String];
+
+    NSString *displayName =
+        [bundle objectForInfoDictionaryKey:@"CFBundleDisplayName"];
+    if (displayName == nil) {
+      displayName = [bundle objectForInfoDictionaryKey:@"CFBundleName"];
+    }
+    if (displayName == nil) {
+      displayName = [bundle bundlePath];
+    }
+
+    installedApp.AppName = [displayName UTF8String];
+
+    NSString *version = [bundle objectForInfoDictionaryKey:@"CFBundleVersion"];
+    if (version == nil) {
+      version =
+          [bundle objectForInfoDictionaryKey:@"CFBundleShortVersionString"];
+    }
+    if (version != nil) {
+      installedApp.Version = [version UTF8String];
+    }
   }
 
   return installedApp;
@@ -76,29 +99,21 @@ std::vector<InstalledApp> ListInstalledApps() {
 
   @autoreleasepool {
     auto defaultManager = [NSFileManager defaultManager];
-
-    auto directoryURL =
-        [NSURL fileURLWithPath:@"/Applications"]; // Replace with your actual
-                                                  // directory path
     NSError *error = nil;
     auto contents = [defaultManager
-          contentsOfDirectoryAtURL:directoryURL
-        includingPropertiesForKeys:nil
+          contentsOfDirectoryAtURL:[NSURL fileURLWithPath:@"/Applications"]
+        includingPropertiesForKeys:[NSArray arrayWithObject:NSURLNameKey]
                            options:NSDirectoryEnumerationSkipsHiddenFiles
                              error:&error];
+    if (error == nil) {
+      for (NSURL *appPath : contents) {
+        auto bundle = [NSBundle bundleWithURL:appPath];
+        NSLog(@"Path: %@ Bundle: %@", appPath, bundle);
 
-    if (error != nil) {
-      for (const id appPath : contents) {
-        auto bundle = [NSBundle bundleWithPath:appPath];
-
-        InstalledApp installedApp;
-        installedApp.AppName = [[bundle
-            objectForInfoDictionaryKey:(id)kCFBundleNameKey] UTF8String];
-        installedApp.Id = [[bundle bundleIdentifier] UTF8String];
-        installedApp.Version = [[bundle
-            objectForInfoDictionaryKey:(id)kCFBundleVersionKey] UTF8String];
-
-        apps.push_back(installedApp);
+        auto app(fromBundle(bundle));
+        if (app.AppType != "invalid") {
+          apps.push_back(app);
+        }
       }
     }
   }
@@ -115,14 +130,9 @@ std::vector<std::string> ListRunningAppIds() {
     for (const id app : apps) {
       auto bundleId = [app bundleIdentifier];
       if (bundleId == nil) {
-          continue;
+        continue;
       }
-      auto bundle = [NSBundle bundleWithIdentifier:bundleId];
-
-      if (bundle != nullptr) {
-        appIds.push_back(std::string([[bundle
-            objectForInfoDictionaryKey:(id)kCFBundleNameKey] UTF8String]));
-      }
+      appIds.push_back([bundleId UTF8String]);
     }
   }
 
@@ -134,8 +144,10 @@ std::unique_ptr<InstalledApp> CurrentApp() {
     auto mainBundle = [NSBundle mainBundle];
 
     if (mainBundle != nullptr) {
-      return std::unique_ptr<InstalledApp>(
-          new InstalledApp(fromBundle(mainBundle)));
+      auto bundle(fromBundle(mainBundle));
+      if (bundle.AppType != "invalid") {
+        return std::unique_ptr<InstalledApp>(new InstalledApp());
+      }
     }
   }
 

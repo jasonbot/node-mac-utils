@@ -79,7 +79,7 @@ module.exports = {
         getRunningProcesses: platform_utils.getRunningProcesses,
         getRunningAppIDs: platform_utils.getRunningAppIDs,
         listInstalledApps: platform_utils.listInstalledApps,
-        currentInstalledApp: platform_utils.listInstalledApps,
+        currentInstalledApp: platform_utils.currentInstalledApp,
         installMSIXAndRestart: platform_utils.installMSIXAndRestart,
       }
     : {}),
