@@ -44,8 +44,6 @@ std::vector<std::string> GetRunningProcesses() {
       continue;
     }
 
-    NSLog(@"I am now here, querying pid %i", pid);
-
     int ret = proc_pidpath(pid, pathbuf, sizeof(pathbuf));
     if (ret > 0) {
       processes.push_back(std::string(pathbuf));
@@ -109,8 +107,6 @@ std::vector<InstalledApp> ListInstalledApps() {
     if (error == nil) {
       for (NSURL *appPath : contents) {
         auto bundle = [NSBundle bundleWithURL:appPath];
-        NSLog(@"Path: %@ Bundle: %@", appPath, bundle);
-
         auto app(fromBundle(bundle));
         if (app.AppType != "invalid") {
           apps.push_back(app);
