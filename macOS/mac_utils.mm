@@ -2,6 +2,7 @@
 #import <Foundation/Foundation.h>
 #import "AudioProcessMonitor.h"
 #import "MicrophoneUsageMonitor.h"
+#include "ProcessUtils.h"
 #include <napi.h>
 
 static MicrophoneUsageMonitor *monitor = nil;
@@ -85,8 +86,8 @@ Napi::Value StartMonitoringMic(const Napi::CallbackInfo& info) {
       0,
       1,
       []( Napi::Env ) {
-        // clean up any resources allocated and passed to the callback 
-        // In our case the micState bool is deallocated in the callback 
+        // clean up any resources allocated and passed to the callback
+        // In our case the micState bool is deallocated in the callback
       }
     );
 
@@ -195,6 +196,66 @@ Napi::Value GetRenderProcessesWithResult(const Napi::CallbackInfo& info) {
   return resultObj;
 }
 
+Napi::Value GetRunningProcessesFunc(const Napi::CallbackInfo& info) {
+  Napi::Env env = info.Env();
+  Napi::Object resultObj = Napi::Array::New(env);
+
+  return resultObj;
+}
+
+
+// Gets a list of full package IDs
+Napi::Value GetRunningAppIDsFunc(const Napi::CallbackInfo& info) {
+  Napi::Env env = info.Env();
+
+  std::vector<std::string> processes = ListRunningAppIds();
+
+  Napi::Array result = Napi::Array::New(env);
+  for (size_t i = 0; i < processes.size(); i++) {
+      result.Set(i, Napi::String::New(env, processes[i]));
+  }
+
+  return result;
+}
+
+static Napi::Object installedAppToObject(const Napi::Env& env, const InstalledApp& app) {
+    Napi::Object appObj = Napi::Object::New(env);
+    appObj.Set("type", Napi::String::New(env, app.AppType));
+    appObj.Set("name", Napi::String::New(env, app.AppName));
+    appObj.Set("id", Napi::String::New(env, app.Id));
+    appObj.Set("version", Napi::String::New(env, app.Version));
+
+    return appObj;
+}
+
+// Gets installed apps
+Napi::Value ListInstalledAppsFunc(const Napi::CallbackInfo& info) {
+  Napi::Env env = info.Env();
+
+  auto apps = ListInstalledApps();
+  Napi::Array result = Napi::Array::New(env);
+  auto index(0);
+  for (auto app : apps) {
+      result.Set(index, installedAppToObject(env, app));
+      index += 1;
+  }
+
+  return result;
+}
+
+Napi::Value CurrentInstalledAppFunc(const Napi::CallbackInfo& info) {
+    auto currentApp = CurrentApp();
+    Napi::Env env = info.Env();
+
+    if (currentApp == nullptr) {
+        return env.Null();
+    } else {
+        auto val = *currentApp;
+        return installedAppToObject(env, val);
+    }
+}
+
+
 Napi::Object Init(Napi::Env env, Napi::Object exports) {
   exports.Set(Napi::String::New(env, "makeKeyAndOrderFront"),
               Napi::Function::New(env, MakeKeyAndOrderFront));
@@ -216,6 +277,18 @@ Napi::Object Init(Napi::Env env, Napi::Object exports) {
 
   exports.Set(Napi::String::New(env, "getProcessesAccessingSpeakersWithResult"),
               Napi::Function::New(env, GetRenderProcessesWithResult));
+
+  exports.Set(Napi::String::New(env, "getRunningProcesses"),
+              Napi::Function::New(env, GetRunningProcessesFunc));
+
+  exports.Set(Napi::String::New(env, "getRunningAppIDs"),
+              Napi::Function::New(env, GetRunningAppIDsFunc));
+
+  exports.Set(Napi::String::New(env, "listInstalledApps"),
+              Napi::Function::New(env, ListInstalledAppsFunc));
+
+  exports.Set(Napi::String::New(env, "currentInstalledApp"),
+              Napi::Function::New(env, CurrentInstalledAppFunc));
 
   return exports;
 }

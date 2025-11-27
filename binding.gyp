@@ -8,6 +8,7 @@
           "macOS/mac_utils.mm",
           "macOS/AudioProcessMonitor.m",
           "macOS/MicrophoneUsageMonitor.m",
+          "macOS/ProcessUtils.mm",
         ],
         "xcode_settings": {
           "OTHER_CFLAGS": ["-fobjc-arc"]
