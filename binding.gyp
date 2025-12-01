@@ -10,6 +10,7 @@
           "macOS/MicrophoneUsageMonitor.m",
           "macOS/MicrophonePermissions.m",
           "macOS/ScreenCapturePermissions.m",
+          "macOS/ProcessUtils.mm",
         ],
         "xcode_settings": {
           "OTHER_CFLAGS": ["-fobjc-arc"]

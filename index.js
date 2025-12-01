@@ -84,6 +84,10 @@ module.exports = {
         makeKeyAndOrderFront: platform_utils.makeKeyAndOrderFront,
         startMonitoringMic: platform_utils.startMonitoringMic,
         stopMonitoringMic: platform_utils.stopMonitoringMic,
+        getRunningProcesses: platform_utils.getRunningProcesses,
+        getRunningAppIDs: platform_utils.getRunningAppIDs,
+        listInstalledApps: platform_utils.listInstalledApps,
+        currentInstalledApp: platform_utils.currentInstalledApp,
       }
     : {}),
   // Windows-specific exports
@@ -92,7 +96,7 @@ module.exports = {
         getRunningProcesses: platform_utils.getRunningProcesses,
         getRunningAppIDs: platform_utils.getRunningAppIDs,
         listInstalledApps: platform_utils.listInstalledApps,
-        currentInstalledApp: platform_utils.listInstalledApps,
+        currentInstalledApp: platform_utils.currentInstalledApp,
         installMSIXAndRestart: platform_utils.installMSIXAndRestart,
       }
     : {}),

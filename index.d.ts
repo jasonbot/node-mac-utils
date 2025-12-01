@@ -40,7 +40,7 @@ declare module "node-mac-utils" {
   export function getRunningProcesses(): string[];
   export function getRunningAppIDs(): string[];
   export function listInstalledApps(): InstalledApp[];
-  export function currentInstalledApp(): InstalledApp | undefined;
+  export function currentInstalledApp(): InstalledApp | null;
   export function installMSIXAndRestart(fileUri: string): void;
 
   // Mac-only

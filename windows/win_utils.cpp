@@ -195,7 +195,6 @@ Napi::Value ListInstalledAppsWindows(const Napi::CallbackInfo& info) {
     Napi::Array result = Napi::Array::New(env);
     auto index(0);
     for (auto app : apps) {
-      Napi::Object appObj = Napi::Object::New(env);
       result.Set(index, installedAppToObject(env, app));
       index += 1;
     }

@@ -4,6 +4,7 @@
 #import "MicrophoneUsageMonitor.h"
 #import "MicrophonePermissions.h"
 #import "ScreenCapturePermissions.h"
+#include "ProcessUtils.h"
 #include <napi.h>
 
 static MicrophoneUsageMonitor *monitor = nil;
@@ -87,8 +88,8 @@ Napi::Value StartMonitoringMic(const Napi::CallbackInfo& info) {
       0,
       1,
       []( Napi::Env ) {
-        // clean up any resources allocated and passed to the callback 
-        // In our case the micState bool is deallocated in the callback 
+        // clean up any resources allocated and passed to the callback
+        // In our case the micState bool is deallocated in the callback
       }
     );
 
@@ -256,6 +257,69 @@ Napi::Value RequestScreenCaptureAccess(const Napi::CallbackInfo& info) {
 
   return Napi::Boolean::New(env, granted);
 }
+Napi::Value GetRunningProcessesFunc(const Napi::CallbackInfo& info) {
+  Napi::Env env = info.Env();
+
+  auto processes = GetRunningProcesses();
+  Napi::Array result = Napi::Array::New(env);
+  for (size_t i = 0; i < processes.size(); i++) {
+      result.Set(i, Napi::String::New(env, processes[i]));
+  }
+
+  return result;
+}
+
+
+// Gets a list of full package IDs
+Napi::Value GetRunningAppIDsFunc(const Napi::CallbackInfo& info) {
+  Napi::Env env = info.Env();
+
+  auto appIds = ListRunningAppIds();
+  Napi::Array result = Napi::Array::New(env);
+  for (size_t i = 0; i < appIds.size(); i++) {
+      result.Set(i, Napi::String::New(env, appIds[i]));
+  }
+
+  return result;
+}
+
+static Napi::Object installedAppToObject(const Napi::Env& env, const InstalledApp& app) {
+    Napi::Object appObj = Napi::Object::New(env);
+    appObj.Set("type", Napi::String::New(env, app.AppType));
+    appObj.Set("name", Napi::String::New(env, app.AppName));
+    appObj.Set("id", Napi::String::New(env, app.Id));
+    appObj.Set("version", Napi::String::New(env, app.Version));
+
+    return appObj;
+}
+
+// Gets installed apps
+Napi::Value ListInstalledAppsFunc(const Napi::CallbackInfo& info) {
+  Napi::Env env = info.Env();
+
+  auto apps = ListInstalledApps();
+  Napi::Array result = Napi::Array::New(env);
+  auto index(0);
+  for (auto app : apps) {
+      result.Set(index, installedAppToObject(env, app));
+      index += 1;
+  }
+
+  return result;
+}
+
+Napi::Value CurrentInstalledAppFunc(const Napi::CallbackInfo& info) {
+    Napi::Env env = info.Env();
+
+    auto currentApp = CurrentApp();
+    if (currentApp == nullptr) {
+        return env.Null();
+    } else {
+        auto val = *currentApp;
+        return installedAppToObject(env, val);
+    }
+}
+
 
 Napi::Object Init(Napi::Env env, Napi::Object exports) {
   exports.Set(Napi::String::New(env, "makeKeyAndOrderFront"),
@@ -290,6 +354,17 @@ Napi::Object Init(Napi::Env env, Napi::Object exports) {
 
   exports.Set(Napi::String::New(env, "requestScreenCaptureAccess"),
               Napi::Function::New(env, RequestScreenCaptureAccess));
+  exports.Set(Napi::String::New(env, "getRunningProcesses"),
+              Napi::Function::New(env, GetRunningProcessesFunc));
+
+  exports.Set(Napi::String::New(env, "getRunningAppIDs"),
+              Napi::Function::New(env, GetRunningAppIDsFunc));
+
+  exports.Set(Napi::String::New(env, "listInstalledApps"),
+              Napi::Function::New(env, ListInstalledAppsFunc));
+
+  exports.Set(Napi::String::New(env, "currentInstalledApp"),
+              Napi::Function::New(env, CurrentInstalledAppFunc));
 
   return exports;
 }
