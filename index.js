@@ -70,11 +70,6 @@ module.exports = {
     platform_utils.getProcessesAccessingMicrophoneDebouncedWithResult,
   getProcessesAccessingSpeakersWithResult:
     platform_utils.getProcessesAccessingSpeakersWithResult,
-  getMicrophoneAuthorizationStatus:
-    platform_utils.getMicrophoneAuthorizationStatus,
-  requestMicrophoneAccess: platform_utils.requestMicrophoneAccess,
-  checkScreenCaptureAccess: platform_utils.checkScreenCaptureAccess,
-  requestScreenCaptureAccess: platform_utils.requestScreenCaptureAccess,
   INFO_ERROR_CODE: 1,
   ERROR_DOMAIN: "com.MicrophoneUsageMonitor",
 
@@ -88,6 +83,11 @@ module.exports = {
         getRunningAppIDs: platform_utils.getRunningAppIDs,
         listInstalledApps: platform_utils.listInstalledApps,
         currentInstalledApp: platform_utils.currentInstalledApp,
+        getMicrophoneAuthorizationStatus:
+          platform_utils.getMicrophoneAuthorizationStatus,
+        requestMicrophoneAccess: platform_utils.requestMicrophoneAccess,
+        checkScreenCaptureAccess: platform_utils.checkScreenCaptureAccess,
+        requestScreenCaptureAccess: platform_utils.requestScreenCaptureAccess,
       }
     : {}),
   // Windows-specific exports

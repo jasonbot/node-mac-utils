@@ -47,4 +47,13 @@ declare module "node-mac-utils" {
   export function makeKeyAndOrderFront(windowID: number): void;
   export function startMonitoringMic(): void;
   export function stopMonitoringMic(): void;
+  export function getMicrophoneAuthorizationStatus():
+    | "NotDetermined"
+    | "Restricted"
+    | "Denied"
+    | "Authorized"
+    | "NotDetermined";
+  export function requestMicrophoneAccess(): bool;
+  export function checkScreenCaptureAccess(): bool;
+  export function requestScreenCaptureAccess(): bool;
 }
