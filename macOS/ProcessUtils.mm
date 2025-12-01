@@ -10,13 +10,10 @@
 std::vector<std::string> GetRunningProcesses() {
   std::vector<std::string> processes;
 
-  static int maxArgumentSize = 0;
-  if (maxArgumentSize == 0) {
-    size_t size = sizeof(maxArgumentSize);
-    if (sysctl((int[]){CTL_KERN, KERN_ARGMAX}, 2, &maxArgumentSize, &size, NULL,
-               0) == -1) {
-      maxArgumentSize = 4096; // Default
-    }
+  static int maxArgumentSize(0);
+  size_t size = sizeof(maxArgumentSize);
+  if (sysctl((int[]){CTL_KERN, KERN_ARGMAX}, 2, &maxArgumentSize, &size, NULL, 0) == -1) {
+    maxArgumentSize = 4096; // Default
   }
   int mib[3] = {CTL_KERN, KERN_PROC, KERN_PROC_ALL};
   struct kinfo_proc *info;
@@ -74,11 +71,14 @@ static InstalledApp fromBundle(NSBundle *bundle) {
     if (displayName == nil) {
       displayName = [bundle objectForInfoDictionaryKey:@"CFBundleName"];
     }
+
     if (displayName == nil) {
       displayName = [bundle bundlePath];
     }
 
-    installedApp.AppName = [displayName UTF8String];
+    if (displayName != nil) {
+        installedApp.AppName = [displayName UTF8String];
+    }
 
     NSString *version = [bundle objectForInfoDictionaryKey:@"CFBundleVersion"];
     if (version == nil) {
@@ -143,7 +143,7 @@ std::unique_ptr<InstalledApp> CurrentApp() {
     if (mainBundle != nullptr) {
       auto bundle(fromBundle(mainBundle));
       if (bundle.AppType != "invalid") {
-        return std::unique_ptr<InstalledApp>(new InstalledApp());
+        return std::unique_ptr<InstalledApp>(new InstalledApp(bundle));
       }
     }
   }
