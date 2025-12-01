@@ -29,8 +29,8 @@ declare module "node-mac-utils" {
 
   // No-op on Mac
   export function getProcessesAccessingSpeakersWithResult(): ResultWithProcesses<ProcessInfo>;
+  export function installMSIXAndRestart(fileUri: string): void;
 
-  // Windows-only
   export type InstalledApp = {
     type: string;
     name: string;
@@ -41,7 +41,6 @@ declare module "node-mac-utils" {
   export function getRunningAppIDs(): string[];
   export function listInstalledApps(): InstalledApp[];
   export function currentInstalledApp(): InstalledApp | null;
-  export function installMSIXAndRestart(fileUri: string): void;
 
   // Mac-only
   export function makeKeyAndOrderFront(windowID: number): void;
