@@ -231,6 +231,24 @@ Napi::Value InstallMSIXAndRestartWindows(const Napi::CallbackInfo& info) {
     return env.Null();
 }
 
+// Gets the microphone authorization status (no-op on Windows)
+Napi::Value GetMicrophoneAuthorizationStatus(const Napi::CallbackInfo& info) {
+  Napi::Env env = info.Env();
+
+  // On Windows, always return "Authorized" as positive permissions
+  return Napi::String::New(env, "Authorized");
+}
+
+// Requests microphone access (no-op on Windows, returns resolved Promise with true)
+Napi::Value RequestMicrophoneAccess(const Napi::CallbackInfo& info) {
+  Napi::Env env = info.Env();
+  Napi::Promise::Deferred deferred = Napi::Promise::Deferred::New(env);
+
+  // On Windows, immediately resolve with true (positive permissions)
+  deferred.Resolve(Napi::Boolean::New(env, true));
+
+  return deferred.Promise();
+}
 
 // Initialize the module exports
 Napi::Object Init(Napi::Env env, Napi::Object exports) {
@@ -243,6 +261,8 @@ Napi::Object Init(Napi::Env env, Napi::Object exports) {
   Napi::Value (*listInstalledAppsFunc)(const Napi::CallbackInfo&) = ListInstalledAppsWindows;
   Napi::Value (*currentInstalledAppFunc)(const Napi::CallbackInfo&) = CurrentInstalledAppWindows;
   Napi::Value (*installMSIXAndRestartFunc)(const Napi::CallbackInfo&) = InstallMSIXAndRestartWindows;
+  Napi::Value (*microphoneAuthStatusFunc)(const Napi::CallbackInfo&) = GetMicrophoneAuthorizationStatus;
+  Napi::Value (*requestMicAccessFunc)(const Napi::CallbackInfo&) = RequestMicrophoneAccess;
 
   exports.Set("getRunningProcesses",
               Napi::Function::New(env, getRunningProcessesFunc));
@@ -262,6 +282,10 @@ Napi::Object Init(Napi::Env env, Napi::Object exports) {
               Napi::Function::New(env, currentInstalledAppFunc));
   exports.Set("installMSIXAndRestart",
               Napi::Function::New(env, installMSIXAndRestartFunc));
+  exports.Set("getMicrophoneAuthorizationStatus",
+              Napi::Function::New(env, microphoneAuthStatusFunc));
+  exports.Set("requestMicrophoneAccess",
+              Napi::Function::New(env, requestMicAccessFunc));
 
   return exports;
 }
