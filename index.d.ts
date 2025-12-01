@@ -32,7 +32,7 @@ declare module "node-mac-utils" {
   export function installMSIXAndRestart(fileUri: string): void;
 
   export type InstalledApp = {
-    type: string;
+    type: "msix" | "desktop" | "application"; // msix/desktop on Windows, application on macOS
     name: string;
     id: string;
     version: string;
