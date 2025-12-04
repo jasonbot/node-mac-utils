@@ -5,7 +5,6 @@
 #ifndef WIN32_LEAN_AND_MEAN
 #define WIN32_LEAN_AND_MEAN
 #endif
-#define NOMINMAX  // Prevent Windows from defining min/max macros
 #include <windows.h>
 
 // Now include other Windows headers
@@ -55,7 +54,7 @@ static std::string GetProcessExecutablePath(DWORD processID) {
 
     WCHAR path[MAX_PATH];
     DWORD size = MAX_PATH;
-    
+
     if (QueryFullProcessImageNameW(hProcess, 0, path, &size)) {
         CloseHandle(hProcess);
         // Convert wide string to regular string
