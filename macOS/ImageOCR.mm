@@ -26,6 +26,7 @@ OCRData OCRImageData(const std::vector<uint8_t> &data) {
     auto handler([[VNImageRequestHandler alloc] initWithCGImage:image
                                                         options:options]);
 
+    auto foundresults(false);
     if (handler != nullptr) {
       auto request([[VNRecognizeTextRequest alloc] init]);
       NSError *err(nullptr);
@@ -35,6 +36,7 @@ OCRData OCRImageData(const std::vector<uint8_t> &data) {
         auto results([request results]);
 
         if (results != nullptr) {
+          foundresults = true;
           auto width(CGImageGetWidth(image)), height(CGImageGetHeight(image));
           for (NSUInteger i(0); i < [results count]; ++i) {
             auto result([results objectAtIndex:i]);
@@ -53,6 +55,10 @@ OCRData OCRImageData(const std::vector<uint8_t> &data) {
       }
     }
     CGImageRelease(image);
-    return OCRData(observations);
+    if (foundresults) {
+      return OCRData(observations);
+    } else {
+      return OCRData(false);
+    }
   }
 }
