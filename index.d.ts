@@ -52,7 +52,7 @@ declare module "node-mac-utils" {
     | "Denied"
     | "Authorized"
     | "NotDetermined";
-  export function requestMicrophoneAccess(): bool;
-  export function checkScreenCaptureAccess(): bool;
-  export function requestScreenCaptureAccess(): bool;
+  export function requestMicrophoneAccess(): boolean;
+  export function checkScreenCaptureAccess(): boolean;
+  export function requestScreenCaptureAccess(): boolean;
 }
