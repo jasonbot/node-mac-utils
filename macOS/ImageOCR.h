@@ -1,6 +1,22 @@
 #pragma once
-#import <vector>
+#include <string>
+#include <vector>
 
-class OCRData {};
+class Rectangle {
+public:
+  size_t x, y, width, height;
+};
 
-OCRData OCRImageData(const std::vector<uint8_t>&);
+class OCRObservation {
+public:
+  Rectangle bbox;
+  std::string text;
+};
+
+class OCRData {
+public:
+  bool success;
+  std::vector<OCRObservation> observations;
+};
+
+OCRData OCRImageData(const std::vector<uint8_t> &);
