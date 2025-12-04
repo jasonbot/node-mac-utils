@@ -29,12 +29,14 @@ OCRData OCRImageData(const std::vector<uint8_t> &data) {
                                      NSError *_Nullable error) {}]);
     NSError *err(nullptr);
     [handler performRequests:@[ request ] error:&err];
+
     if (err == nullptr) {
       auto results([request results]);
+      auto width(CGImageGetWidth(image)), height(CGImageGetHeight(image));
       if (results != nullptr) {
         for (NSUInteger i(0); i < [results count]; ++i) {
           auto result([results objectAtIndex:i]);
-          [result boundingBox];
+          auto bbox(VNImageRectForNormalizedRect([result boundingBox], width, height));
         }
       }
     }
