@@ -10,37 +10,50 @@ OCRData OCRImageData(const std::vector<uint8_t> &data) {
   CGDataProviderRef prov(
       CGDataProviderCreateWithData(nullptr, rawData, length, nullptr));
   if (prov == nullptr) {
-    return OCRData();
+    return OCRData(false);
   }
-  auto image(CGImageCreateWithPNGDataProvider(prov, NULL, true,
-                                              kCGRenderingIntentDefault));
-  CGDataProviderRelease(prov);
-  if (image == nullptr) {
-    return OCRData();
-  }
+  @autoreleasepool {
+    auto image(CGImageCreateWithPNGDataProvider(prov, NULL, true,
+                                                kCGRenderingIntentDefault));
+    CGDataProviderRelease(prov);
+    if (image == nullptr) {
+      return OCRData(false);
+    }
 
-  auto options([NSDictionary alloc]);
-  auto handler([[VNImageRequestHandler alloc] initWithCGImage:image
-                                                      options:options]);
+    auto options([NSDictionary alloc]);
+    auto handler([[VNImageRequestHandler alloc] initWithCGImage:image
+                                                        options:options]);
 
-  if (handler != nullptr) {
-    auto request([[VNRecognizeTextRequest alloc] init]);
-    NSError *err(nullptr);
-    [handler performRequests:@[ request ] error:&err];
+    if (handler != nullptr) {
+      auto request([[VNRecognizeTextRequest alloc] init]);
+      NSError *err(nullptr);
+      [handler performRequests:@[ request ] error:&err];
 
-    if (err == nullptr) {
-      auto results([request results]);
-      auto width(CGImageGetWidth(image)), height(CGImageGetHeight(image));
-      if (results != nullptr) {
-        for (NSUInteger i(0); i < [results count]; ++i) {
-          auto result([results objectAtIndex:i]);
-          auto bbox(VNImageRectForNormalizedRect([result boundingBox], width,
-                                                 height));
+      if (err == nullptr) {
+        auto results([request results]);
+
+        if (results != nullptr) {
+          auto width(CGImageGetWidth(image)), height(CGImageGetHeight(image));
+          std::vector<OCRObservation> observations;
+          for (NSUInteger i(0); i < [results count]; ++i) {
+            auto result([results objectAtIndex:i]);
+            auto bbox(VNImageRectForNormalizedRect([result boundingBox], width,
+                                                   height));
+            auto firstObject([[result topCandidates:1] firstObject]);
+            if (firstObject != nullptr && [firstObject string] != nullptr) {
+              const auto rect(
+                  Rectangle{size_t(bbox.origin.x), size_t(bbox.origin.y),
+                            size_t(bbox.size.width), size_t(bbox.size.height)});
+              const std::string text([[firstObject string] UTF8String]);
+              observations.emplace_back(rect, text);
+            }
+          }
+          return OCRData(observations);
         }
       }
     }
-  }
 
-  CGImageRelease(image);
-  return OCRData();
+    CGImageRelease(image);
+    return OCRData(false);
+  }
 }
