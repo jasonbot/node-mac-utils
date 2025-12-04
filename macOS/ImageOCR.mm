@@ -12,6 +12,8 @@ OCRData OCRImageData(const std::vector<uint8_t> &data) {
   if (prov == nullptr) {
     return OCRData(false);
   }
+  std::vector<OCRObservation> observations;
+
   @autoreleasepool {
     auto image(CGImageCreateWithPNGDataProvider(prov, NULL, true,
                                                 kCGRenderingIntentDefault));
@@ -34,7 +36,6 @@ OCRData OCRImageData(const std::vector<uint8_t> &data) {
 
         if (results != nullptr) {
           auto width(CGImageGetWidth(image)), height(CGImageGetHeight(image));
-          std::vector<OCRObservation> observations;
           for (NSUInteger i(0); i < [results count]; ++i) {
             auto result([results objectAtIndex:i]);
             auto bbox(VNImageRectForNormalizedRect([result boundingBox], width,
@@ -48,12 +49,10 @@ OCRData OCRImageData(const std::vector<uint8_t> &data) {
               observations.emplace_back(rect, text);
             }
           }
-          return OCRData(observations);
         }
       }
     }
-
     CGImageRelease(image);
-    return OCRData(false);
+    return OCRData(observations);
   }
 }
