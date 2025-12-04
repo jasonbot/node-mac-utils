@@ -24,9 +24,7 @@ OCRData OCRImageData(const std::vector<uint8_t> &data) {
                                                       options:options]);
 
   if (handler != nullptr) {
-    auto request([[VNRecognizeTextRequest alloc]
-        initWithCompletionHandler:[](VNRequest *_Nonnull request,
-                                     NSError *_Nullable error) {}]);
+    auto request([[VNRecognizeTextRequest alloc] init]);
     NSError *err(nullptr);
     [handler performRequests:@[ request ] error:&err];
 
@@ -36,7 +34,8 @@ OCRData OCRImageData(const std::vector<uint8_t> &data) {
       if (results != nullptr) {
         for (NSUInteger i(0); i < [results count]; ++i) {
           auto result([results objectAtIndex:i]);
-          auto bbox(VNImageRectForNormalizedRect([result boundingBox], width, height));
+          auto bbox(VNImageRectForNormalizedRect([result boundingBox], width,
+                                                 height));
         }
       }
     }
